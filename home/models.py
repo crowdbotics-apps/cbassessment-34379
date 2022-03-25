@@ -27,13 +27,19 @@ class App(models.Model):
     framework = models.CharField(choices=FRAMEWORK_CHOICES, max_length=20, verbose_name="Framework")
     domain_name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Domain name")
     screenshot = models.URLField(blank=True, null=True, verbose_name="Screenshot")
-    subscription = models.IntegerField(verbose_name="Subscription", blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="User")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
     updated_at = models.DateTimeField(auto_now=True,verbose_name="Updated at")
 
     def __str__(self) -> str:
         return f"App: {self.name}"
+
+    @property
+    def subscription(self):
+        """
+        Return the latest active subscription for the app
+        """
+        return self.app_subscriptions.filter(active=True).last().id
 
 class Plan(models.Model):
     name = models.CharField(max_length=20, blank=False, verbose_name="Name")
