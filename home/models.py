@@ -1,4 +1,3 @@
-from unicodedata import name
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -44,7 +43,7 @@ class Plan(models.Model):
     updated_at = models.DateTimeField(auto_now=True,verbose_name="Updated at")
 
     def __str__(self) -> str:
-        return f"App: {self.name}"
+        return f"Plan: {self.name}"
 
 class Subscription(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="User")
