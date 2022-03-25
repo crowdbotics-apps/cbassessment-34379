@@ -79,9 +79,23 @@ class PasswordSerializer(PasswordResetSerializer):
 
 
 class AppSerializer(serializers.ModelSerializer):
+    subscription = serializers.ReadOnlyField()
+
     class Meta:
         model = App
-        fields = "__all__"
+        fields = [
+            "id", 
+            "name", 
+            "description",
+            "type",
+            "framework",
+            "domain_name",
+            "screenshot",
+            "subscription",
+            "user",
+            "created_at",
+            "updated_at" 
+        ]
 
 
 class PlanSerializer(serializers.ModelSerializer):

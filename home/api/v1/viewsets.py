@@ -1,8 +1,9 @@
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.response import Response
+from rest_framework import mixins
 
 from home.models import App, Plan, Subscription
 
@@ -41,6 +42,21 @@ class ReadOnly(BasePermission):
         return request.method in SAFE_METHODS
 
 
+class CreateListRetrieveUpdateViewSet(mixins.CreateModelMixin,
+                                mixins.ListModelMixin,
+                                mixins.RetrieveModelMixin,
+                                mixins.UpdateModelMixin,
+                                GenericViewSet):
+    """
+    A viewset that provides `retrieve`, `create`, and `list` actions.
+
+    To use it, override the class and set the `.queryset` and
+    `.serializer_class` attributes.
+    """
+    pass
+
+
+
 class AppViewSet(ModelViewSet):
     serializer_class = AppSerializer
     permission_classes = [IsAuthenticated]
@@ -55,7 +71,7 @@ class PlanViewSet(ModelViewSet):
     queryset = Plan.objects.all()
 
 
-class SubscriptionViewSet(ModelViewSet):
+class SubscriptionViewSet(CreateListRetrieveUpdateViewSet):
     serializer_class = SubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
