@@ -1,11 +1,17 @@
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.response import Response
+
+from home.models import App, Plan, Subscription
 
 from home.api.v1.serializers import (
     SignupSerializer,
     UserSerializer,
+    AppSerializer,
+    PlanSerializer,
+    SubscriptionSerializer
 )
 
 
@@ -28,3 +34,33 @@ class LoginViewSet(ViewSet):
         token, created = Token.objects.get_or_create(user=user)
         user_serializer = UserSerializer(user)
         return Response({"token": token.key, "user": user_serializer.data})
+
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in SAFE_METHODS
+
+
+class AppViewSet(ModelViewSet):
+    serializer_class = AppSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return App.objects.filter(user=self.request.user)
+
+
+class PlanViewSet(ModelViewSet):
+    serializer_class = PlanSerializer
+    permission_classes = [IsAdminUser|ReadOnly]
+    queryset = Plan.objects.all()
+
+
+class SubscriptionViewSet(ModelViewSet):
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Subscription.objects.filter(
+            user=self.request.user,
+            active=True
+        )
